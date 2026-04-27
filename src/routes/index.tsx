@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -162,13 +163,28 @@ function SEOResourceCard({ title }: { title: string }) {
 }
 
 function Navbar() {
+  const [theme, setTheme] = useState("dark");
   const nav = [["Product", "#product"], ["Workflow", "#workflow"], ["Use cases", "#use-cases"], ["Pricing", "#pricing"], ["Resources", "#resources"]];
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("settleproof-theme") || "dark";
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("settleproof-theme", nextTheme);
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/82 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8" aria-label="Main navigation">
         <a href="#top" className="flex items-center gap-3" aria-label="SettleProof home"><LogoMark /><span className="text-lg font-bold text-foreground">SettleProof</span></a>
         <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex">{nav.map(([item, href]) => <a key={item} href={href} className="transition hover:text-foreground">{item}</a>)}</div>
-        <div className="flex items-center gap-2"><a href={appUrl} className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline">Login</a><Button asChild variant="glass" size="sm"><a href={demoEmail}>Book a demo</a></Button><Button asChild variant="hero" size="sm"><a href={appUrl}>Try SettleProof</a></Button></div>
+        <div className="flex items-center gap-2"><button type="button" onClick={toggleTheme} className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-elevated text-foreground transition hover:bg-secondary" aria-label="Toggle dark and light mode">{theme === "dark" ? "☾" : "☼"}</button><a href={appUrl} className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline">Login</a><Button asChild variant="glass" size="sm"><a href={demoEmail}>Book a demo</a></Button><Button asChild variant="hero" size="sm"><a href={appUrl}>Try SettleProof</a></Button></div>
       </nav>
     </header>
   );
@@ -247,6 +263,23 @@ function CoreValue() {
   return <section className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="What SettleProof gives your finance team" /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">{values.map((value) => <article key={value.title} className="glass-panel rounded-xl p-6"><h3 className="text-xl font-bold text-foreground">{value.title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{value.text}</p></article>)}</div></div></section>;
 }
 
+function ProductProof() {
+  return (
+    <section className="bg-surface px-5 py-20 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+        <div>
+          <SectionHeader align="left" title="Approval-ready evidence, without another long dashboard." copy="SettleProof keeps the workflow focused: upload files, run matching, inspect the few exceptions, and export the proof your accountant needs." />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-border bg-card p-5"><h3 className="font-bold text-foreground">Rules prove the money</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">UTR, IDs, amounts, dates, fees, GST, refunds, and payout formulas.</p></div>
+            <div className="rounded-xl border border-border bg-card p-5"><h3 className="font-bold text-foreground">AI explains the mess</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">Column mapping, narration clues, fuzzy references, and readable exception summaries.</p></div>
+          </div>
+        </div>
+        <EvidenceDrawerPreview />
+      </div>
+    </section>
+  );
+}
+
 function Exceptions() {
   const exceptions = [
     ["Missing bank credit", "Gateway says the settlement was paid, but no matching bank credit or UTR was found.", "Check settlement status or bank posting delay."],
@@ -257,19 +290,6 @@ function Exceptions() {
     ["Delayed settlement", "Settlement matches the bank credit, but the bank date is outside the expected window.", "Approve as delayed or investigate posting issue."],
   ];
   return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Exceptions finance teams can actually act on." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{exceptions.map(([title, description, action]) => <ExceptionCard key={title} title={title} description={description} action={action} />)}</div><div className="mt-8 text-center"><Button asChild variant="glass" size="lg"><a href="#workflow">View sample exceptions</a></Button></div></div></section>;
-}
-
-function EvidenceAudit() {
-  return <section className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Designed for approval, not blind automation." copy="Finance teams trust SettleProof because every recommendation is backed by source evidence. AI explains the issue, but the reviewer makes the final call." /><EvidenceDrawerPreview /><blockquote className="mx-auto mt-8 max-w-3xl text-center text-2xl font-bold text-foreground">Rules prove the money. AI explains the mess.</blockquote></div></section>;
-}
-
-function Trust() {
-  const columns: CardItem[] = [
-    { title: "Rules first", text: "UTR, payment ID, invoice ID, settlement ID, amount/date windows, and payout formulas." },
-    { title: "AI assistance", text: "Column mapping, narration understanding, fuzzy reference matching, probable cause, and summary generation." },
-    { title: "Human approval", text: "Review notes, timestamps, decisions, and audit trail before reporting or export." },
-  ];
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="AI where it helps. Deterministic rules where money matters." copy="SettleProof does not silently change accounting records. It prepares reconciliation work and gives finance teams the evidence to approve." /><div className="grid gap-5 md:grid-cols-3">{columns.map((item) => <article key={item.title} className="rounded-xl border border-border bg-card p-6"><h3 className="text-xl font-bold text-foreground">{item.title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p></article>)}</div></div></section>;
 }
 
 function UseCases() {
@@ -336,15 +356,12 @@ function Index() {
       <Hero />
       <Problem />
       <ProductWorkflow />
-      <VideoSection />
       <CoreValue />
       <Exceptions />
-      <EvidenceAudit />
-      <Trust />
+      <ProductProof />
       <UseCases />
       <Integrations />
       <Pricing />
-      <FounderPartner />
       <Resources />
       <FAQ />
       <FinalCTA />
