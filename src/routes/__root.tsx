@@ -29,16 +29,16 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SettleProof — AI Payment Reconciliation Software for Finance Teams" },
+      { title: "SettleProof — AI Payment Reconciliation Software" },
       {
         name: "description",
         content:
-          "SettleProof reconciles Razorpay, Stripe, bank statements, invoices, refunds, fees, and settlements. AI prepares reconciliation, finance teams approve exceptions, and exports are audit-ready.",
+          "SettleProof reconciles Razorpay, Stripe, bank statements, invoices, refunds, fees, GST, and settlements. AI prepares reconciliation and finance teams approve exceptions with evidence.",
       },
       {
         name: "keywords",
         content:
-          "AI payment reconciliation software, automated payment reconciliation, Razorpay reconciliation software, Stripe payout reconciliation, bank statement reconciliation, invoice reconciliation automation, settlement reconciliation software, AI accounting reconciliation, payment gateway reconciliation India",
+          "AI payment reconciliation software, Razorpay reconciliation software, Stripe payout reconciliation, bank statement reconciliation, invoice reconciliation automation, payment gateway reconciliation, settlement reconciliation software, UTR reconciliation, GST fee reconciliation, AI accounting reconciliation",
       },
       { name: "author", content: "SettleProof" },
       { property: "og:title", content: "SettleProof — AI Payment Reconciliation Software" },
@@ -69,7 +69,7 @@ export const Route = createRootRoute({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI reconciliation software for payment gateways, bank statements, invoices, refunds, fees, and settlements.",
+            "AI payment reconciliation software for payment gateways, bank statements, invoices, settlements, refunds, fees, and exceptions.",
           url: "https://settleproof.app",
           offers: {
             "@type": "Offer",
