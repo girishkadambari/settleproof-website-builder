@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -162,13 +163,28 @@ function SEOResourceCard({ title }: { title: string }) {
 }
 
 function Navbar() {
+  const [theme, setTheme] = useState("dark");
   const nav = [["Product", "#product"], ["Workflow", "#workflow"], ["Use cases", "#use-cases"], ["Pricing", "#pricing"], ["Resources", "#resources"]];
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("settleproof-theme") || "dark";
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("settleproof-theme", nextTheme);
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/82 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8" aria-label="Main navigation">
         <a href="#top" className="flex items-center gap-3" aria-label="SettleProof home"><LogoMark /><span className="text-lg font-bold text-foreground">SettleProof</span></a>
         <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex">{nav.map(([item, href]) => <a key={item} href={href} className="transition hover:text-foreground">{item}</a>)}</div>
-        <div className="flex items-center gap-2"><a href={appUrl} className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline">Login</a><Button asChild variant="glass" size="sm"><a href={demoEmail}>Book a demo</a></Button><Button asChild variant="hero" size="sm"><a href={appUrl}>Try SettleProof</a></Button></div>
+        <div className="flex items-center gap-2"><button type="button" onClick={toggleTheme} className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-elevated text-foreground transition hover:bg-secondary" aria-label="Toggle dark and light mode">{theme === "dark" ? "☾" : "☼"}</button><a href={appUrl} className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline">Login</a><Button asChild variant="glass" size="sm"><a href={demoEmail}>Book a demo</a></Button><Button asChild variant="hero" size="sm"><a href={appUrl}>Try SettleProof</a></Button></div>
       </nav>
     </header>
   );
