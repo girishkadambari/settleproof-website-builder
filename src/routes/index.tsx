@@ -356,14 +356,12 @@ function Index() {
       <Hero />
       <Problem />
       <ProductWorkflow />
-      <VideoSection />
       <CoreValue />
       <Exceptions />
       <ProductProof />
       <UseCases />
       <Integrations />
       <Pricing />
-      <FounderPartner />
       <Resources />
       <FAQ />
       <FinalCTA />
