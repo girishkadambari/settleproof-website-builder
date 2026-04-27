@@ -29,14 +29,56 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "SettleProof — AI Payment Reconciliation Software for Finance Teams" },
+      {
+        name: "description",
+        content:
+          "SettleProof reconciles Razorpay, Stripe, bank statements, invoices, refunds, fees, and settlements. AI prepares reconciliation, finance teams approve exceptions, and exports are audit-ready.",
+      },
+      {
+        name: "keywords",
+        content:
+          "AI payment reconciliation software, automated payment reconciliation, Razorpay reconciliation software, Stripe payout reconciliation, bank statement reconciliation, invoice reconciliation automation, settlement reconciliation software, AI accounting reconciliation, payment gateway reconciliation India",
+      },
+      { name: "author", content: "SettleProof" },
+      { property: "og:title", content: "SettleProof — AI Payment Reconciliation Software" },
+      {
+        property: "og:description",
+        content:
+          "Reconcile payment gateway payouts, bank credits, invoices, refunds, fees, and settlement mismatches in minutes.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:url", content: "https://settleproof.app" },
+      { property: "og:image", content: "/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SettleProof — AI Payment Reconciliation Software" },
+      {
+        name: "twitter:description",
+        content:
+          "Reconcile Razorpay, Stripe, bank statements, invoices, refunds, fees, and settlements with exception-first AI workflows.",
+      },
+      { name: "twitter:image", content: "/og-image.png" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "SettleProof",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          description:
+            "AI reconciliation software for payment gateways, bank statements, invoices, refunds, fees, and settlements.",
+          url: "https://settleproof.app",
+          offers: {
+            "@type": "Offer",
+            price: "9999",
+            priceCurrency: "INR",
+            description: "Starter pricing placeholder for early teams",
+          },
+        }),
+      },
     ],
     links: [
       {
