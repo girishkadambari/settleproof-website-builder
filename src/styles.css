@@ -158,5 +158,69 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .settleproof-grid {
+    background-image:
+      linear-gradient(to right, var(--ledger-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--ledger-line) 1px, transparent 1px),
+      radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--brand-glow) 35%, transparent), transparent 38%);
+    background-size: 72px 72px, 72px 72px, 100% 100%;
+  }
+
+  .transaction-rain::before {
+    content: "utr fee gst settlement refund invoice payout bank credit 486.08 480.00 matched exception ";
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: color-mix(in oklab, var(--foreground) 8%, transparent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+    line-height: 2.1;
+    letter-spacing: 0.08em;
+    word-spacing: 2rem;
+    opacity: 0.65;
+    mask-image: linear-gradient(to bottom, transparent, black 18%, black 70%, transparent);
+    pointer-events: none;
+  }
+
+  .glass-panel {
+    background: linear-gradient(180deg, color-mix(in oklab, var(--card) 86%, transparent), color-mix(in oklab, var(--surface) 78%, transparent));
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(18px);
+  }
+
+  .glow-ring {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 28%, transparent), var(--shadow-glow);
+  }
+}
+
+@keyframes float-proof {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .float-proof {
+    animation: float-proof 7s ease-in-out infinite;
   }
 }
