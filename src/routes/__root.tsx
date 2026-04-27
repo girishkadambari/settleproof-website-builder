@@ -29,33 +29,33 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SettleProof — AI Payment Reconciliation Software" },
+      { title: "SettleProof — AI Worker for Payment Reconciliation" },
       {
         name: "description",
         content:
-          "SettleProof reconciles Razorpay, Stripe, bank statements, invoices, refunds, fees, GST, and settlements. AI prepares reconciliation and finance teams approve exceptions with evidence.",
+          "Hire an AI Worker to automate Razorpay, Stripe, and bank reconciliation. SettleProof matches payments, handles exceptions, and provides audit-ready evidence.",
       },
       {
         name: "keywords",
         content:
-          "AI payment reconciliation software, Razorpay reconciliation software, Stripe payout reconciliation, bank statement reconciliation, invoice reconciliation automation, payment gateway reconciliation, settlement reconciliation software, UTR reconciliation, GST fee reconciliation, AI accounting reconciliation",
+          "AI worker, AI payment reconciliation software, Razorpay reconciliation software, Stripe payout reconciliation, bank statement reconciliation, invoice reconciliation automation, payment gateway reconciliation, settlement reconciliation software, UTR reconciliation, GST fee reconciliation, AI accounting reconciliation",
       },
       { name: "author", content: "SettleProof" },
-      { property: "og:title", content: "SettleProof — AI Payment Reconciliation Software" },
+      { property: "og:title", content: "SettleProof — AI Worker for Payment Reconciliation" },
       {
         property: "og:description",
         content:
-          "Reconcile payment gateway payouts, bank credits, invoices, refunds, fees, and settlement mismatches in minutes.",
+          "Hire an AI Worker to automate Razorpay, Stripe, and bank reconciliation. SettleProof matches payments, handles exceptions, and provides audit-ready evidence.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://settleproof.app" },
       { property: "og:image", content: "/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SettleProof — AI Payment Reconciliation Software" },
+      { name: "twitter:title", content: "SettleProof — AI Worker for Payment Reconciliation" },
       {
         name: "twitter:description",
         content:
-          "Reconcile Razorpay, Stripe, bank statements, invoices, refunds, fees, and settlements with exception-first AI workflows.",
+          "Hire an AI Worker to automate Razorpay, Stripe, and bank reconciliation. SettleProof matches payments, handles exceptions, and provides audit-ready evidence.",
       },
       { name: "twitter:image", content: "/og-image.png" },
     ],
@@ -82,6 +82,11 @@ export const Route = createRootRoute({
     ],
     links: [
       {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicon.svg",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -94,12 +99,11 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        <ScriptOnce>{`(function(){try{var t=localStorage.getItem('settleproof-theme')||'dark';document.documentElement.classList.toggle('dark',t==='dark');}catch(e){document.documentElement.classList.add('dark');}})();`}</ScriptOnce>
         {children}
         <Scripts />
       </body>

@@ -1,0 +1,27 @@
+# SettleProof
+
+## What SettleProof is
+SettleProof is an AI payment reconciliation product for finance teams. It acts as an exception-first reconciliation execution layer. We help reconcile Razorpay, Stripe, bank statements, invoices, refunds, fees, GST/tax, settlements, UTRs, payout reports, and payment mismatches.
+
+## Positioning
+SettleProof is NOT a full accounting system. 
+AI prepares the reconciliation. Finance approves exceptions with evidence.
+Deterministic rules match what is certain, and SettleProof helps reduce spreadsheet work making exception review faster.
+
+## Who it is for
+- CFOs and finance heads
+- Accountants and CA firms
+- Founders of SaaS/D2C/ecommerce companies
+- Payment operations teams
+- Outsourced CFO/bookkeeping teams
+
+## Core Features
+1. Multi-System Ingestion: Support for Razorpay, Cashfree, PayU, Stripe, bank CSVs, Tally, Zoho Books.
+2. AI Column Mapping: Automatically identifies IDs, UTRs, fees, and GST.
+3. Deterministic Matching: Prove every rupee with settlement formulas.
+4. AI Exception Diagnosis: Intelligent analysis of variances.
+
+## Key URLs
+- Homepage: https://settleproof.app
+- App Login: https://cloud.settleproof.app/
+- Contact: hello@settleproof.app

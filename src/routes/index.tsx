@@ -1,371 +1,453 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-
 import { Button } from "@/components/ui/button";
+import { ArrowRight, ShieldCheck, Zap, Layers, BrainCircuit, Activity, FileSpreadsheet, Cpu, Search, BarChart3, Database } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const appUrl = "https://cloud.settleproof.app/";
+const appUrl = "https://cloud.settleproof.app/app";
 const demoEmail = "mailto:hello@settleproof.app";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type CardItem = {
-  title: string;
-  text: string;
-};
+function SpotlightCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-type ProductScreenshotCardProps = {
-  label: string;
-  src: string;
-  caption: string;
-  tall?: boolean;
-};
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ y: -5 }}
+      className={`relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-card transition-all hover:border-primary/40 ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(168,85,247,0.15), transparent 40%)`,
+        }}
+      />
+      {children}
+    </motion.div>
+  );
+}
 
 function LogoMark() {
   return (
-    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/35 bg-surface-elevated text-primary glow-ring" aria-hidden="true">
-      <svg viewBox="0 0 32 32" className="h-5 w-5" fill="none">
-        <path d="M7 11.5h10.5L25 16l-7.5 4.5H7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M10 7.5h11M10 24.5h11" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-    </span>
+    <svg viewBox="35 -5 155 130" className="h-9 w-auto text-white drop-shadow-sm" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M 80 75 L 115 75 L 145 45 L 110 45 Z" />
+      <path d="M 165 35 L 105 35 L 65 75 L 40 100 L 40 35 A 25 25 0 0 1 65 10 L 165 10 L 165 0 L 185 17.5 Z" />
+      <path d="M 60 85 L 120 85 L 160 45 L 185 20 L 185 85 A 25 25 0 0 1 160 110 L 60 110 L 60 120 L 40 102.5 Z" />
+    </svg>
   );
 }
 
 function SectionHeader({ eyebrow, title, copy, align = "center" }: { eyebrow?: string; title: string; copy?: string; align?: "center" | "left" }) {
   return (
-    <div className={align === "center" ? "mx-auto mb-10 max-w-3xl text-center md:mb-14" : "mb-10 max-w-3xl md:mb-14"}>
-      {eyebrow && <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">{eyebrow}</p>}
-      <h2 className="text-balance text-3xl font-bold tracking-normal text-foreground md:text-5xl">{title}</h2>
-      {copy && <p className="mt-5 text-pretty text-base leading-7 text-muted-foreground md:text-lg">{copy}</p>}
-    </div>
-  );
-}
-
-function ProductScreenshotCard({ label, src, caption, tall }: ProductScreenshotCardProps) {
-  return (
-    <figure className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition duration-300 hover:-translate-y-1 hover:border-primary/45">
-      <div className={tall ? "relative min-h-80 bg-screenshot" : "relative min-h-60 bg-screenshot"}>
-        <div className="absolute inset-4 rounded-lg border border-primary/20 bg-surface-elevated p-4">
-          <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-primary">{label}</span>
-            <span className="rounded-full border border-border px-2 py-1 text-[10px] text-muted-foreground">replace: {src}</span>
-          </div>
-          <div className="space-y-3">
-            <div className="h-8 rounded-md bg-secondary" />
-            <div className="grid grid-cols-3 gap-2">
-              <div className="h-16 rounded-md bg-muted" />
-              <div className="h-16 rounded-md bg-muted" />
-              <div className="h-16 rounded-md bg-muted" />
-            </div>
-            <div className="space-y-2">
-              <div className="h-3 w-11/12 rounded-full bg-border" />
-              <div className="h-3 w-8/12 rounded-full bg-border" />
-              <div className="h-3 w-10/12 rounded-full bg-primary/35" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">{caption}</figcaption>
-    </figure>
-  );
-}
-
-function ProductVideoCard() {
-  return (
-    <div className="glass-panel relative overflow-hidden rounded-2xl p-4 md:p-6">
-      <div className="bg-screenshot relative flex min-h-[340px] items-center justify-center overflow-hidden rounded-xl border border-border">
-        <div className="absolute left-5 top-5 rounded-full border border-border bg-surface-elevated px-3 py-1 text-xs font-medium text-muted-foreground">60 sec product walkthrough</div>
-        <div className="absolute bottom-5 left-5 right-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background/80 p-4 backdrop-blur">
-          <p className="font-semibold text-foreground">Upload → Map → Reconcile → Review → Export</p>
-          <p className="text-xs text-muted-foreground">VIDEO_PLACEHOLDER_PRODUCT_DEMO · /media/product-demo.mp4</p>
-        </div>
-        <button className="flex h-20 w-20 items-center justify-center rounded-full border border-primary/50 bg-primary text-primary-foreground shadow-glow transition hover:scale-105" aria-label="Play product demo video">
-          <svg viewBox="0 0 24 24" className="ml-1 h-8 w-8" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function WorkflowStep({ index, title, copy, media, caption }: { index: number; title: string; copy: string; media: string; caption: string }) {
-  return (
-    <article className="workflow-step relative grid gap-6 rounded-2xl border border-border bg-card p-5 shadow-card lg:grid-cols-[0.8fr_1.2fr] lg:p-6">
-      <div>
-        <span className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg border border-primary/40 bg-primary text-sm font-bold text-primary-foreground glow-ring">{index}</span>
-        <h3 className="text-2xl font-bold text-foreground">{title}</h3>
-        <p className="mt-4 text-sm leading-6 text-muted-foreground">{copy}</p>
-      </div>
-      <ProductScreenshotCard label={title} src={media} caption={caption} />
-    </article>
-  );
-}
-
-function ExceptionCard({ title, description, action }: { title: string; description: string; action: string }) {
-  return (
-    <article className="rounded-xl border border-border bg-card p-6 transition duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-glow">
-      <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/35 bg-secondary text-primary">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </div>
-      <h3 className="text-xl font-bold text-foreground">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
-      <p className="mt-4 border-t border-border pt-4 text-sm text-surface-foreground"><span className="font-semibold text-primary">Action:</span> {action}</p>
-    </article>
-  );
-}
-
-function EvidenceDrawerPreview() {
-  const checks = ["Gateway settlement row", "Bank credit line", "Invoice reference", "Fee and GST split", "Reviewer note"];
-  return (
-    <div className="glass-panel overflow-hidden rounded-2xl">
-      <div className="grid gap-6 p-5 lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
-        <ProductScreenshotCard label="Exception audit drawer" src="/media/exception-audit-drawer.gif" caption="Primary finding, calculation proof, source evidence, reviewer decision, and export status." tall />
-        <div className="rounded-xl border border-border bg-surface p-5">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">Primary finding</p>
-          <h3 className="mt-3 text-2xl font-bold text-foreground">Net settlement variance</h3>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {[["Expected", "₹486.08"], ["Bank received", "₹480.00"], ["Difference", "₹6.08"]].map(([label, value]) => <div key={label} className="rounded-lg border border-border bg-card p-3"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 font-bold text-foreground">{value}</p></div>)}
-          </div>
-          <div className="mt-5 rounded-lg border border-primary/30 bg-secondary p-4">
-            <p className="font-semibold text-foreground">Settlement calculation proof</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Gross payment − gateway fee − GST + refund adjustment = expected bank credit.</p>
-          </div>
-          <ul className="mt-5 space-y-3 text-sm text-surface-foreground">
-            {checks.map((check) => <li key={check} className="flex items-center gap-3"><span className="h-2 w-2 rounded-full bg-primary" />{check}</li>)}
-          </ul>
-          <div className="mt-5 rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground"><span className="font-semibold text-foreground">AI diagnosis:</span> Fee/GST split likely explains the variance. Reviewer should verify deduction rows before approving.</div>
-          <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-semibold text-foreground"><span className="rounded-md border border-border px-3 py-2 text-center">Resolve</span><span className="rounded-md border border-border px-3 py-2 text-center">Escalate</span><span className="rounded-md border border-primary/40 px-3 py-2 text-center text-primary">Export</span></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IntegrationBadge({ name, soon }: { name: string; soon?: boolean }) {
-  return <div className={soon ? "rounded-xl border border-border bg-surface p-4 text-center text-sm text-muted-foreground" : "rounded-xl border border-primary/30 bg-card p-5 text-center font-bold text-foreground"}>{name}{soon ? " · Coming soon" : ""}</div>;
-}
-
-function PricingCard({ name, price, desc, items }: { name: string; price: string; desc: string; items: string[] }) {
-  return (
-    <article className="glass-panel rounded-2xl p-7 transition duration-300 hover:-translate-y-1 hover:border-primary/50">
-      <h3 className="text-2xl font-bold text-foreground">{name}</h3>
-      <p className="mt-4 text-3xl font-bold text-primary">{price}</p>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">{desc}</p>
-      <ul className="mt-6 space-y-3 text-sm text-surface-foreground">{items.map((item) => <li key={item} className="flex gap-2"><span className="text-primary">✓</span>{item}</li>)}</ul>
-      <Button asChild variant="hero" size="lg" className="mt-7 w-full"><a href={appUrl}>Start pilot</a></Button>
-    </article>
-  );
-}
-
-function SEOResourceCard({ title }: { title: string }) {
-  return <a href="#resources" className="rounded-xl border border-border bg-card p-6 text-lg font-bold text-foreground transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-card">{title}</a>;
-}
-
-function Navbar() {
-  const [theme, setTheme] = useState("dark");
-  const nav = [["Product", "#product"], ["Workflow", "#workflow"], ["Use cases", "#use-cases"], ["Pricing", "#pricing"], ["Resources", "#resources"]];
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("settleproof-theme") || "dark";
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    localStorage.setItem("settleproof-theme", nextTheme);
-    document.documentElement.classList.toggle("dark", nextTheme === "dark");
-  };
-
-  return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/82 backdrop-blur-xl">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8" aria-label="Main navigation">
-        <a href="#top" className="flex items-center gap-3" aria-label="SettleProof home"><LogoMark /><span className="text-lg font-bold text-foreground">SettleProof</span></a>
-        <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex">{nav.map(([item, href]) => <a key={item} href={href} className="transition hover:text-foreground">{item}</a>)}</div>
-        <div className="flex items-center gap-2"><button type="button" onClick={toggleTheme} className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-elevated text-foreground transition hover:bg-secondary" aria-label="Toggle dark and light mode">{theme === "dark" ? "☾" : "☼"}</button><a href={appUrl} className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline">Login</a><Button asChild variant="glass" size="sm"><a href={demoEmail}>Book a demo</a></Button><Button asChild variant="hero" size="sm"><a href={appUrl}>Try SettleProof</a></Button></div>
-      </nav>
-    </header>
-  );
-}
-
-function HeroMockup() {
-  const files = ["Razorpay payments.csv", "Bank statement.xlsx", "Invoices.csv", "Settlement report.csv"];
-  const outputs = ["Matched", "Needs review", "Export ready"];
-  return (
-    <div className="float-proof relative mx-auto mt-14 max-w-6xl rounded-2xl border border-primary/25 bg-card p-3 shadow-glow md:p-4">
-      <div className="glass-panel overflow-hidden rounded-xl">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3"><div className="flex gap-2"><span className="h-3 w-3 rounded-full bg-destructive" /><span className="h-3 w-3 rounded-full bg-chart-5" /><span className="h-3 w-3 rounded-full bg-chart-2" /></div><span className="text-xs text-muted-foreground">SettleProof Worker · product media placeholder</span></div>
-        <div className="grid gap-6 p-5 lg:grid-cols-[0.9fr_1fr_0.9fr] lg:p-7">
-          <div className="space-y-3">{files.map((file) => <div key={file} className="slide-card rounded-xl border border-border bg-surface p-4 text-sm font-semibold text-foreground">{file}</div>)}</div>
-          <div className="relative flex min-h-72 items-center justify-center rounded-2xl border border-primary/30 bg-screenshot p-5">
-            <div className="absolute inset-x-6 top-8 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
-            <div className="flex h-36 w-36 flex-col items-center justify-center rounded-2xl border border-primary/45 bg-background/85 text-center shadow-glow backdrop-blur"><LogoMark /><p className="mt-3 text-sm font-bold text-foreground">SettleProof Worker</p><p className="mt-1 text-xs text-muted-foreground">rules + AI</p></div>
-          </div>
-          <div className="space-y-3">{outputs.map((item) => <div key={item} className="rounded-xl border border-primary/35 bg-secondary p-4 text-sm font-bold text-foreground">{item}</div>)}<div className="rounded-xl border border-border bg-surface p-4 text-xs leading-6 text-muted-foreground">UTR matched · Net settlement variance · Missing bank credit</div></div>
-        </div>
-        <div className="grid border-t border-border text-center text-xs font-semibold text-muted-foreground sm:grid-cols-5"><span className="p-3">Upload files</span><span className="p-3">AI maps columns</span><span className="p-3">Run reconciliation</span><span className="p-3">Review exceptions</span><span className="p-3">Export report</span></div>
-      </div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className={align === "center" ? "mx-auto mb-16 max-w-4xl text-center" : "mb-16 max-w-3xl"}
+    >
+      {eyebrow && <span className="mb-4 inline-block rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">{eyebrow}</span>}
+      <h2 className="text-balance text-4xl font-bold tracking-tight text-white md:text-6xl">{title}</h2>
+      {copy && <p className="mt-6 text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">{copy}</p>}
+    </motion.div>
   );
 }
 
 function Hero() {
   return (
-    <section id="top" className="settleproof-grid transaction-rain relative overflow-hidden px-5 pb-20 pt-20 lg:px-8 lg:pb-28 lg:pt-24">
-      <div className="relative mx-auto max-w-7xl text-center">
-        <p className="mx-auto mb-5 w-fit rounded-full border border-border bg-surface-elevated px-4 py-2 text-sm font-medium text-muted-foreground">AI prepares reconciliation. Finance approves exceptions with evidence.</p>
-        <h1 className="mx-auto max-w-6xl text-balance text-4xl font-bold tracking-normal text-foreground md:text-7xl">Reconcile payments, payouts, and bank credits without spreadsheet chaos.</h1>
-        <p className="mx-auto mt-7 max-w-4xl text-pretty text-lg leading-8 text-muted-foreground md:text-xl">SettleProof turns Razorpay, Stripe, bank statements, and invoice exports into matched records, explained exceptions, and audit-ready reports.</p>
-        <p className="mt-4 text-base font-semibold text-foreground">AI maps messy files. Rules reconcile the money. Your finance team approves only the exceptions.</p>
-        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"><Button asChild variant="hero" size="xl"><a href={appUrl}>Try SettleProof</a></Button><Button asChild variant="glass" size="xl"><a href={demoEmail}>Book a demo</a></Button></div>
-        <p className="mt-5 text-sm text-muted-foreground">Upload sample files and get your first reconciliation run in minutes.</p>
-        <HeroMockup />
+    <section id="top" className="relative overflow-hidden bg-black px-6 pt-32 pb-20 lg:px-8 lg:pt-48 lg:pb-32">
+      <div className="absolute top-0 left-1/2 -z-10 h-[800px] w-full -translate-x-1/2 rounded-[100%] bg-primary/20 blur-[120px] opacity-30" />
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center"
+        >
+          <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Piloting with modern finance teams
+          </div>
+          <h1 className="mx-auto max-w-5xl text-balance text-5xl font-extrabold tracking-tight text-white md:text-8xl">
+            Your AI Reconciliation <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary">Worker</span>.
+          </h1>
+          <p className="mx-auto mt-8 max-w-3xl text-pretty text-lg leading-8 text-muted-foreground md:text-2xl">
+            Hire SettleProof to match Razorpay, Stripe, and bank credits.
+            Automated proof for every settlement, so you only handle the exceptions.
+          </p>
+          <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row">
+            <Button asChild size="xl" className="h-16 rounded-2xl bg-primary px-10 text-xl font-bold shadow-lg hover:scale-105 transition">
+              <a href={appUrl}>Launch App <ArrowRight className="ml-2 h-5 w-5" /></a>
+            </Button>
+            <Button asChild variant="outline" size="xl" className="h-16 rounded-2xl border-white/10 bg-white/5 px-10 text-xl font-bold backdrop-blur-md transition hover:bg-white/10">
+              <a href={demoEmail}>Book a Demo</a>
+            </Button>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function Problem() {
-  const cards: CardItem[] = [
-    { title: "Gateway payouts are not enough", text: "Razorpay or Stripe may show a payout, but finance still needs to prove which invoices, refunds, fees, and taxes were included." },
-    { title: "Bank credits hide many transactions", text: "One bank credit can contain dozens or hundreds of payments, deductions, GST/tax, refunds, and adjustments." },
-    { title: "References rarely match cleanly", text: "Invoices, payment IDs, UTRs, settlement IDs, customer names, and bank narrations often use different formats." },
-    { title: "Accountants review too many rows", text: "Finance teams waste time checking rows that should have been matched automatically, instead of reviewing real exceptions." },
-  ];
-  return <section id="product" className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Payment reconciliation is still manual because the truth is split across systems." /><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{cards.map((card) => <article key={card.title} className="rounded-xl border border-border bg-card p-6"><h3 className="text-xl font-bold text-foreground">{card.title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{card.text}</p></article>)}</div><p className="mx-auto mt-10 max-w-3xl text-center text-xl font-semibold text-foreground">SettleProof reduces the work to what actually needs human judgment.</p></div></section>;
-}
-
-function ProductWorkflow() {
-  const steps = [
-    ["Upload files", "Upload Razorpay, Stripe, bank statements, invoices, settlements, refunds, or CSV/XLSX exports.", "/media/upload-files.png", "Upload files screenshot/GIF"],
-    ["AI maps columns", "SettleProof detects fields like payment ID, order ID, invoice ID, UTR, gross amount, fee, GST/tax, refund, settlement amount, and bank narration.", "/media/ai-column-mapping.gif", "AI column mapping screenshot/GIF"],
-    ["Run reconciliation", "Create a run from normalized files. The engine matches records using UTRs, IDs, amounts, dates, and settlement formulas.", "/media/reconciliation-run.gif", "Run reconciliation screenshot/GIF"],
-    ["Review exceptions", "Finance sees only open issues like missing bank credit, net settlement variance, unknown deposit, missing invoice, duplicate payment, and refund adjustment.", "/media/exception-list.png", "Exception list screenshot/GIF"],
-    ["Approve and export", "Open the evidence drawer, review the calculation proof, add notes, resolve exceptions, and export accountant-ready XLSX reports.", "/media/export-report.png", "Exception audit drawer + export screenshot/GIF"],
-  ];
-  return <section id="workflow" className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="From messy payment files to approved reconciliation." copy="A workflow built for real finance files, not a generic dashboard." /><div className="relative space-y-5 before:absolute before:left-6 before:top-6 before:hidden before:h-[calc(100%-3rem)] before:w-px before:bg-gradient-to-b before:from-primary before:via-border before:to-transparent lg:before:block">{steps.map(([title, copy, media, caption], index) => <WorkflowStep key={title} index={index + 1} title={title} copy={copy} media={media} caption={caption} />)}</div></div></section>;
-}
-
-function VideoSection() {
-  const highlights = ["AI maps messy finance files", "Matching engine proves every settlement", "Finance approves exceptions with evidence"];
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-6xl"><SectionHeader title="Watch SettleProof prepare a reconciliation run." /><ProductVideoCard /><div className="mt-6 grid gap-4 md:grid-cols-3">{highlights.map((item) => <div key={item} className="rounded-xl border border-border bg-card p-5 text-center font-semibold text-foreground">{item}</div>)}</div></div></section>;
-}
-
-function CoreValue() {
-  const values: CardItem[] = [
-    { title: "Fewer rows to review", text: "Automatically match clean records and show only the exceptions that need approval." },
-    { title: "Clear settlement proof", text: "Unpack payouts into payments, fees, GST/tax, refunds, adjustments, and bank credits." },
-    { title: "Evidence for every decision", text: "Every match and exception includes source rows, matching reason, confidence, and reviewer notes." },
-    { title: "Faster month-end close", text: "Move from spreadsheet investigation to structured exception review and export." },
-  ];
-  return <section className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="What SettleProof gives your finance team" /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">{values.map((value) => <article key={value.title} className="glass-panel rounded-xl p-6"><h3 className="text-xl font-bold text-foreground">{value.title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{value.text}</p></article>)}</div></div></section>;
-}
-
-function ProductProof() {
+function IntegrationLogos() {
   return (
-    <section className="bg-surface px-5 py-20 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-        <div>
-          <SectionHeader align="left" title="Approval-ready evidence, without another long dashboard." copy="SettleProof keeps the workflow focused: upload files, run matching, inspect the few exceptions, and export the proof your accountant needs." />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-5"><h3 className="font-bold text-foreground">Rules prove the money</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">UTR, IDs, amounts, dates, fees, GST, refunds, and payout formulas.</p></div>
-            <div className="rounded-xl border border-border bg-card p-5"><h3 className="font-bold text-foreground">AI explains the mess</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">Column mapping, narration clues, fuzzy references, and readable exception summaries.</p></div>
+    <section className="border-y border-white/5 bg-black/50 py-12 backdrop-blur-sm relative z-10">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">Seamless integrations with your finance stack</p>
+        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8 opacity-40 grayscale transition hover:opacity-100 hover:grayscale-0">
+          <img src="/media/logos/stripe.svg" alt="Stripe" className="h-8 w-auto object-contain brightness-0 invert" />
+          <img src="/media/logos/razorpay.svg" alt="Razorpay" className="h-8 w-auto object-contain brightness-0 invert" />
+          <span className="text-2xl font-bold tracking-tighter text-white">CASHFREE</span>
+          <img src="/media/logos/zoho.svg" alt="Zoho Books" className="h-8 w-auto object-contain brightness-0 invert" />
+          <span className="text-2xl font-bold tracking-tighter text-white">TALLY</span>
+          <img src="/media/logos/quickbooks.svg" alt="QuickBooks" className="h-8 w-auto object-contain brightness-0 invert" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const steps = [
+  { id: "ingest", title: "Ingest", icon: <Layers className="h-4 w-4" />, img: "/media/settelproof_upload_screen.png", desc: "Connect Razorpay, Stripe, and your banks. SettleProof normalizes messy CSV and XLSX files in seconds.", value: "Saves 4 hours of manual data formatting per week." },
+  { id: "map", title: "Map", icon: <BrainCircuit className="h-4 w-4" />, img: "/media/settelproof_ai_coloum_mapping.png", desc: "Our AI Worker automatically identifies transaction IDs, UTRs, fees, and GST columns across all your files.", value: "Eliminates endless VLOOKUP mapping." },
+  { id: "match", title: "Match", icon: <Activity className="h-4 w-4" />, img: "/media/settelproof_reconsilation.png", desc: "The engine applies settlement formulas to prove every rupee. Match thousands of rows with mathematical certainty.", value: "Reconciles 10,000+ rows in under 2 minutes." },
+  { id: "audit", title: "Audit", icon: <Search className="h-4 w-4" />, img: "/media/settelproof_exception.png", desc: "AI diagnosis explains variances. Finance teams review only the exceptions with deep-dive evidence.", value: "Reduces variance investigation time by 90%." },
+  { id: "export", title: "Export", icon: <FileSpreadsheet className="h-4 w-4" />, img: "/media/settelproof_reports_export.png", desc: "Download accountant-ready XLSX reports with full traceability. Close your month-end in minutes, not days.", value: "Guarantees a zero-stress month-end close." },
+];
+
+function PlatformExplorer() {
+  const [activeTab, setActiveTab] = useState(steps[0].id);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(() => {
+      setActiveTab((current) => {
+        const currentIndex = steps.findIndex((s) => s.id === current);
+        const nextIndex = (currentIndex + 1) % steps.length;
+        return steps[nextIndex].id;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isHovered]);
+
+  return (
+    <section className="bg-black py-32 px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader title="The Reconciliation Workflow." copy="Experience how SettleProof orchestrates your finance data." />
+
+        <div className="flex flex-col items-center" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+          {/* Navigation Pills */}
+          <div className="mb-12 flex flex-wrap justify-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 backdrop-blur-xl">
+            {steps.map((step) => (
+              <button
+                key={step.id}
+                onClick={() => setActiveTab(step.id)}
+                className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all ${activeTab === step.id ? "text-white scale-105" : "text-muted-foreground hover:text-white"
+                  }`}
+              >
+                {activeTab === step.id && (
+                  <motion.div
+                    layoutId="active-tab"
+                    className="absolute inset-0 rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <span className={activeTab === step.id ? "text-white" : "text-primary/70"}>{step.icon}</span>
+                  {step.title}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Interactive Stage */}
+          <div className="relative w-full max-w-6xl">
+            <div className="absolute -inset-1 rounded-[3rem] bg-gradient-to-b from-primary/20 to-transparent blur-3xl opacity-50" />
+            <div className="relative rounded-[2.5rem] border border-white/10 bg-card p-4 shadow-2xl overflow-hidden min-h-[500px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5, ease: "circOut" }}
+                  className="grid lg:grid-cols-[1fr_0.4fr] gap-12 p-8"
+                >
+                  <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-black flex items-center justify-center p-4">
+                    <img
+                      src={steps.find(s => s.id === activeTab)?.img}
+                      alt={activeTab}
+                      className="w-full max-h-[450px] object-contain opacity-90 transition duration-700 hover:opacity-100 hover:scale-[1.02]"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <h3 className="text-4xl font-extrabold text-white mb-6">
+                      {steps.find(s => s.id === activeTab)?.title}
+                    </h3>
+                    <p className="text-xl leading-relaxed text-muted-foreground">
+                      {steps.find(s => s.id === activeTab)?.desc}
+                    </p>
+                    <div className="mt-8 rounded-2xl bg-white/5 p-4 border border-white/10 backdrop-blur-sm">
+                      <div className="flex items-center gap-3 text-primary font-bold mb-2">
+                        <Zap className="h-5 w-5" />
+                        AI Value Delivered
+                      </div>
+                      <p className="text-white">
+                        {steps.find(s => s.id === activeTab)?.value}
+                      </p>
+                    </div>
+                    <div className="mt-10">
+                      <Button asChild size="lg" className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold transition-all hover:scale-105">
+                        <a href={appUrl}>See it in action</a>
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-        <EvidenceDrawerPreview />
       </div>
     </section>
   );
 }
 
-function Exceptions() {
-  const exceptions = [
-    ["Missing bank credit", "Gateway says the settlement was paid, but no matching bank credit or UTR was found.", "Check settlement status or bank posting delay."],
-    ["Net settlement variance", "Expected net settlement does not equal the bank credit after fees, tax, refunds, and adjustments.", "Review fee/GST split, adjustment, or gateway settlement correction."],
-    ["Missing invoice", "Payment was captured and settled, but no matching invoice or order record exists.", "Create or attach the invoice before close."],
-    ["Likely offline payment", "Bank received money, but no gateway payment record or invoice match was found.", "Attach customer/invoice or mark as unknown deposit."],
-    ["Duplicate payment candidate", "Two captured payments look linked to the same customer, order, or invoice.", "Review before marking duplicate or refunding."],
-    ["Delayed settlement", "Settlement matches the bank credit, but the bank date is outside the expected window.", "Approve as delayed or investigate posting issue."],
-  ];
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Exceptions finance teams can actually act on." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{exceptions.map(([title, description, action]) => <ExceptionCard key={title} title={title} description={description} action={action} />)}</div><div className="mt-8 text-center"><Button asChild variant="glass" size="lg"><a href="#workflow">View sample exceptions</a></Button></div></div></section>;
+function AIEngineValue() {
+  return (
+    <section id="ai-value" className="bg-black px-6 py-32 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader eyebrow="AI Intelligence" title="Let AI do the heavy lifting." copy="Stop wasting hours on VLOOKUPs. SettleProof's AI models analyze context, match patterns, and explain variances instantly." />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:grid-rows-2">
+          {/* Top large row - The AI Analyzer */}
+          <SpotlightCard className="col-span-1 flex flex-col justify-between p-8 md:col-span-12 md:row-span-1 lg:flex-row lg:items-center lg:gap-12">
+            <div className="max-w-xl lg:w-1/2">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <BrainCircuit className="h-6 w-6" />
+              </div>
+              <h3 className="text-3xl font-bold text-white">Contextual Exception Analysis</h3>
+              <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+                When a payout doesn't match the bank credit, the AI Worker reads the bank narration, analyzes missing GST, and flags exactly why the variance occurred. It doesn't just say "Error"—it tells you the story behind the mismatch.
+              </p>
+            </div>
+            <div className="mt-8 lg:mt-0 lg:w-1/2 overflow-hidden rounded-[2rem] border border-white/5 bg-black">
+              <img src="/media/settelproof_ai_analyer.png" alt="AI Context Analysis" className="w-full opacity-90 transition duration-700 hover:opacity-100 hover:scale-[1.02]" />
+            </div>
+          </SpotlightCard>
+
+          {/* Bottom left - Smart Exception Routing */}
+          <SpotlightCard className="col-span-1 flex flex-col justify-between p-8 md:col-span-7 md:row-span-1">
+            <div>
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">Smart Exception Routing</h3>
+              <p className="mt-4 text-muted-foreground">
+                SettleProof's deterministic engine auto-matches 99% of your data. The remaining 1% of complex exceptions are grouped intuitively for your finance team to review and approve in seconds.
+              </p>
+            </div>
+            <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-white/5 bg-black">
+              <img src="/media/settelproof_exception.png" alt="Exception Handling" className="w-full opacity-90 transition duration-500 hover:opacity-100" />
+            </div>
+          </SpotlightCard>
+
+          {/* Bottom right - Zero Setup Integration */}
+          <SpotlightCard className="col-span-1 flex flex-col justify-between p-8 md:col-span-5 md:row-span-1">
+            <div>
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
+                <Zap className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">Zero-Setup Ingestion</h3>
+              <p className="mt-4 text-muted-foreground">
+                Don't build custom parsers. Upload any CSV/XLSX and the AI automatically detects headers, normalizes amounts, and maps the columns.
+              </p>
+            </div>
+            <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-white/5 bg-black flex items-center justify-center">
+              <img src="/media/settelproof_integration.png" alt="Zero-Setup Integrations" className="w-full object-contain opacity-90 transition duration-500 hover:opacity-100" />
+            </div>
+          </SpotlightCard>
+
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function UseCases() {
-  const cases: CardItem[] = [
-    { title: "Indian SaaS", text: "Reconcile Razorpay/Stripe payments, invoices, bank credits, refunds, and month-end exceptions." },
-    { title: "D2C and ecommerce", text: "Unpack gateway settlements, refunds, fees, taxes, and order-level mismatches." },
-    { title: "Accountants and CA firms", text: "Process client reconciliation files faster and export audit-ready workpapers." },
-    { title: "Outsourced CFO teams", text: "Reduce manual reconciliation effort across clients and review exceptions with evidence." },
-    { title: "Agencies and service businesses", text: "Match invoices, bank transfers, payment links, and offline customer payments." },
+  const cases = [
+    { title: "Indian SaaS", desc: "Reconcile Razorpay/Stripe, GST, and bank credits.", icon: <BarChart3 className="h-6 w-6" /> },
+    { title: "D2C Brands", desc: "Manage high-volume settlements, COD, and refunds.", icon: <Zap className="h-6 w-6" /> },
+    { title: "CFO Teams", desc: "Accelerate month-end close with audit-ready trails.", icon: <ShieldCheck className="h-6 w-6" /> },
+    { title: "CA Firms", desc: "Automate client reconciliations at scale.", icon: <Database className="h-6 w-6" /> },
   ];
-  return <section id="use-cases" className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Built for payment-heavy finance teams." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">{cases.map((item) => <article key={item.title} className="rounded-xl border border-border bg-card p-6"><h3 className="text-lg font-bold text-foreground">{item.title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p></article>)}</div></div></section>;
+
+  return (
+    <section id="use-cases" className="bg-black px-6 py-32 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader title="Built for the modern finance stack." copy="Use cases designed for complex, high-volume reconciliations." />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {cases.map((c, i) => (
+            <SpotlightCard key={i} className="p-8 border border-white/10 bg-card transition hover:border-primary/40">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                {c.icon}
+              </div>
+              <h3 className="text-xl font-bold text-white">{c.title}</h3>
+              <p className="mt-4 text-muted-foreground leading-relaxed">{c.desc}</p>
+            </SpotlightCard>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function Integrations() {
-  const mvp = ["CSV/XLSX uploads", "Razorpay", "Stripe", "Bank statements", "Invoice exports"];
-  const soon = ["Cashfree", "PayU", "Zoho Books", "Tally", "QuickBooks", "Xero", "Google Sheets", "Gmail ingestion"];
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Start with uploads. Connect systems as you grow." copy="You do not need deep integrations to start. Upload last month’s files and get a reconciliation run today." /><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{mvp.map((item) => <IntegrationBadge key={item} name={item} />)}</div><div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{soon.map((item) => <IntegrationBadge key={item} name={item} soon />)}</div></div></section>;
+export function Navbar() {
+  return (
+    <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-xl">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
+        <a href="/" className="flex items-center gap-3.5"><LogoMark /><span className="text-[28px] font-bold tracking-normal text-white">SettleProof</span></a>
+        <div className="hidden lg:flex lg:gap-x-12">{[["Product", "/#product"], ["Use Cases", "/#use-cases"], ["Blog", "/blog"], ["Pilot", "/#pilot"]].map(([n, h]) => (<a key={n} href={h} className="text-sm font-bold text-muted-foreground hover:text-white transition">{n}</a>))}</div>
+        <div className="flex items-center gap-8">
+          <a href={appUrl} className="text-sm font-bold text-white hover:text-primary transition">Log in</a>
+          <Button asChild size="lg" className="rounded-xl bg-primary font-bold hover:scale-105 transition">
+            <a href={appUrl}>Launch App</a>
+          </Button>
+        </div>
+      </nav>
+    </header>
+  );
 }
 
-function Pricing() {
-  const plans = [
-    { name: "Starter", price: "₹9,999/month", desc: "For small teams running monthly reconciliation.", items: ["CSV/XLSX uploads", "AI column mapping", "Reconciliation runs", "Exception review", "XLSX exports"] },
-    { name: "Growth", price: "₹24,999/month", desc: "For teams with multiple gateways or higher volume.", items: ["Everything in Starter", "Saved mapping templates", "Advanced exception types", "Multi-file reconciliation", "Accountant summary export"] },
-    { name: "Concierge Pilot", price: "Custom", desc: "For design partners, accountants, and CFO firms.", items: ["Share sample files", "We help configure mappings", "Custom matching rules", "Guided onboarding"] },
-  ];
-  return <section id="pricing" className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Start with your real reconciliation files." /><div className="grid gap-5 lg:grid-cols-3">{plans.map((plan) => <PricingCard key={plan.name} {...plan} />)}</div></div></section>;
-}
+function PilotSection() {
+  const [result, setResult] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-function FounderPartner() {
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-5xl rounded-2xl border border-primary/30 bg-card p-8 text-center shadow-glow md:p-12"><h2 className="text-3xl font-bold text-foreground md:text-5xl">Looking for finance teams who still reconcile manually.</h2><p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">If your team spends hours matching Razorpay, Stripe, bank credits, invoices, refunds, and gateway fees, I want to work with you. Share last month’s sample files and I’ll show what SettleProof can automate.</p><Button asChild variant="hero" size="xl" className="mt-8"><a href={demoEmail}>Become a design partner</a></Button></div></section>;
-}
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setResult("");
 
-function Resources() {
-  const resources = ["How to reconcile Razorpay settlements with bank statements", "Stripe payout reconciliation guide for SaaS companies", "What is UTR matching?", "How refunds affect gateway settlements", "Payment gateway fee and GST reconciliation", "Best payment reconciliation software for Indian businesses"];
-  return <section id="resources" className="bg-surface px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeader title="Reconciliation guides for finance teams." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{resources.map((title) => <SEOResourceCard key={title} title={title} />)}</div></div></section>;
-}
+    const formData = new FormData(event.currentTarget);
+    formData.append("access_key", "bfcd5130-a9cd-4501-b230-651b4808b41b");
+    formData.append("subject", "New SettleProof Design Partner Lead");
 
-function FAQ() {
-  const faqs = [
-    ["Is SettleProof an accounting system?", "No. SettleProof is a reconciliation execution layer. It helps prepare matched records, exceptions, and exports for your finance or accounting workflow."],
-    ["Does AI decide financial truth?", "No. Deterministic rules match what is certain. AI helps with messy data, explanation, and summaries. Finance users approve exceptions."],
-    ["What can I upload?", "CSV/XLSX files for Razorpay, Stripe, bank statements, settlements, invoices, refunds, and payment exports."],
-    ["Can it handle Razorpay UTR reconciliation?", "Yes. The workflow is designed around settlement IDs, UTRs, net settlement amounts, fees, GST/tax, refunds, and bank credits."],
-    ["Can I try it without connecting APIs?", "Yes. Start with file uploads. API connectors can come later."],
-    ["What does the export include?", "Matched records, exceptions, evidence references, reviewer notes, and accountant-ready XLSX reports."],
-    ["Who should use this?", "Finance teams, accountants, CA firms, founders, D2C teams, SaaS businesses, and outsourced CFO teams."],
-  ];
-  return <section className="px-5 py-20 lg:px-8"><div className="mx-auto max-w-4xl"><SectionHeader title="Questions finance teams ask first." /><div className="space-y-4">{faqs.map(([q, a]) => <details key={q} className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-lg font-bold text-foreground">{q}</summary><p className="mt-3 text-sm leading-6 text-muted-foreground">{a}</p></details>)}</div></div></section>;
-}
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
 
-function FinalCTA() {
-  return <section className="settleproof-grid px-5 py-24 text-center lg:px-8"><div className="mx-auto max-w-4xl"><h2 className="text-balance text-4xl font-bold text-foreground md:text-6xl">Stop reviewing every row. Start approving only the exceptions.</h2><p className="mt-6 text-lg leading-8 text-muted-foreground">Upload sample files, run reconciliation, review evidence, and export audit-ready reports.</p><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><Button asChild variant="hero" size="xl"><a href={appUrl}>Try SettleProof</a></Button><Button asChild variant="glass" size="xl"><a href={demoEmail}>Book a demo</a></Button></div></div></section>;
-}
+      const data = await response.json();
+      if (data.success) {
+        setResult("Success! We'll be in touch shortly.");
+        (event.target as HTMLFormElement).reset();
+      } else {
+        setResult("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      setResult("Error submitting form. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-function Footer() {
-  const groups = { Product: ["Workflow", "Exception review", "Evidence audit", "Export reports", "Login"], "Use cases": ["Razorpay reconciliation", "Stripe reconciliation", "Bank reconciliation", "Invoice matching", "Accountants"], Resources: ["Guides", "Blog", "Demo data", "Docs"], Company: ["Contact", "Privacy", "Terms"] };
-  return <footer className="border-t border-border px-5 py-12 lg:px-8"><div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.3fr_2fr]"><div><div className="flex items-center gap-3"><LogoMark /><span className="text-xl font-bold text-foreground">SettleProof</span></div><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">SettleProof is an AI reconciliation worker for finance teams handling payment gateways, bank statements, invoices, settlements, refunds, and exceptions.</p></div><div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{Object.entries(groups).map(([group, links]) => <div key={group}><h3 className="font-bold text-foreground">{group}</h3><ul className="mt-4 space-y-3 text-sm text-muted-foreground">{links.map((link) => <li key={link}><a href={link === "Login" ? appUrl : group === "Company" && link === "Contact" ? demoEmail : link === "Workflow" ? "#workflow" : "#resources"} className="hover:text-foreground">{link}</a></li>)}</ul></div>)}</div></div></footer>;
+  return (
+    <section id="pilot" className="bg-black px-6 py-32 lg:px-8">
+      <div className="mx-auto max-w-5xl rounded-[3rem] border border-primary/20 bg-card p-8 text-center md:p-20 overflow-hidden relative">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 bg-primary/20 blur-[80px]" />
+        <SectionHeader eyebrow="Pilot Program" title="Join our Design Partners." copy="Work directly with the founders to automate your reconciliation. Let's see if we're a good fit." />
+
+        <form className="mx-auto mt-10 flex max-w-xl flex-col gap-5 text-left relative z-10" onSubmit={onSubmit}>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground ml-2">Name</label>
+              <input type="text" name="name" placeholder="John Doe" required className="h-14 w-full rounded-2xl border border-white/20 bg-white/5 px-6 text-white placeholder:text-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground ml-2">Work Email</label>
+              <input type="email" name="email" placeholder="john@company.com" required className="h-14 w-full rounded-2xl border border-white/20 bg-white/5 px-6 text-white placeholder:text-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground ml-2">Primary Gateway / Bank Setup</label>
+            <input type="text" name="gateway" placeholder="e.g. Razorpay + HDFC" required className="h-14 w-full rounded-2xl border border-white/20 bg-white/5 px-6 text-white placeholder:text-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground ml-2">Monthly Transaction Volume</label>
+            <select name="volume" defaultValue="" required className="h-14 w-full rounded-2xl border border-white/20 bg-white/5 px-6 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary appearance-none cursor-pointer hover:bg-white/10 transition">
+              <option value="" disabled className="text-black">Select volume</option>
+              <option value="< 10k" className="text-black">Less than 10,000</option>
+              <option value="10k - 100k" className="text-black">10,000 - 100,000</option>
+              <option value="100k+" className="text-black">100,000+</option>
+            </select>
+          </div>
+
+          <Button type="submit" size="xl" disabled={isSubmitting} className="mt-4 h-14 w-full rounded-2xl bg-primary text-lg font-bold hover:scale-[1.02] transition">
+            {isSubmitting ? "Submitting..." : "Request Access"}
+          </Button>
+
+          {result && (
+            <p className={`text-center text-sm font-medium mt-2 ${result.includes("Success") ? "text-green-400" : "text-red-400"}`}>
+              {result}
+            </p>
+          )}
+        </form>
+
+        <div className="mt-12 flex justify-center relative z-10">
+          <Button asChild variant="outline" className="rounded-full border-white/10 bg-white/5 px-6 text-sm font-medium backdrop-blur-md transition hover:bg-white/10">
+            <a href={appUrl}>Or try Early Access immediately <ArrowRight className="ml-2 h-4 w-4" /></a>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function Index() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, []);
+
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="relative min-h-screen bg-black selection:bg-primary/30 selection:text-white overflow-hidden font-sans">
+      <div className="pointer-events-none fixed -z-10 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]" style={{ left: mousePosition.x, top: mousePosition.y }} />
       <Navbar />
       <Hero />
-      <Problem />
-      <ProductWorkflow />
-      <CoreValue />
-      <Exceptions />
-      <ProductProof />
+      <IntegrationLogos />
+      <PlatformExplorer />
+      <AIEngineValue />
       <UseCases />
-      <Integrations />
-      <Pricing />
-      <Resources />
-      <FAQ />
-      <FinalCTA />
-      <Footer />
+      <PilotSection />
+      <footer className="border-t border-white/5 bg-black py-12">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex justify-between items-center text-muted-foreground text-sm">
+          <span>© {new Date().getFullYear()} SettleProof</span>
+          <div className="flex gap-8"><a href={demoEmail} className="hover:text-primary transition">Contact</a><a href="#" className="hover:text-primary transition">Privacy</a></div>
+        </div>
+      </footer>
     </main>
   );
 }
