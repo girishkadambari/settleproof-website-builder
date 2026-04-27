@@ -359,8 +359,7 @@ function Index() {
       <VideoSection />
       <CoreValue />
       <Exceptions />
-      <EvidenceAudit />
-      <Trust />
+      <ProductProof />
       <UseCases />
       <Integrations />
       <Pricing />
