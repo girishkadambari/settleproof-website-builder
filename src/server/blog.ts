@@ -1,24 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
-import fs from "fs";
-import path from "path";
 import matter from "gray-matter";
 
-// We read from the current working directory
-const CONTENT_DIR = path.join(process.cwd(), "content");
+// Load all markdown files at build time for Cloudflare compatibility
+const markdownFiles = import.meta.glob('/content/blog/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
 
 export const getPosts = createServerFn({ method: "GET" }).handler(async () => {
-  const blogDir = path.join(CONTENT_DIR, "blog");
-  if (!fs.existsSync(blogDir)) return [];
-
-  const files = fs.readdirSync(blogDir);
-  const posts = files
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const fullPath = path.join(blogDir, file);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
+  const posts = Object.entries(markdownFiles)
+    .map(([filepath, fileContents]) => {
+      const filename = filepath.split("/").pop() || "";
       const { data } = matter(fileContents);
       return {
-        slug: data.slug || file.replace(/\.md$/, ""),
+        slug: data.slug || filename.replace(/\.md$/, ""),
         title: data.title || "Untitled",
         description: data.description || "",
         date: data.date || "2026-04-28",
@@ -34,30 +30,23 @@ export const getPosts = createServerFn({ method: "GET" }).handler(async () => {
 export const getPostBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data: payload }: { data: unknown }) => {
     const slug = typeof payload === "string" ? payload : String(payload);
-    const blogDir = path.join(CONTENT_DIR, "blog");
-    if (!fs.existsSync(blogDir)) throw new Error("Blog directory not found");
 
-    const files = fs.readdirSync(blogDir);
-    const matchedFile = files.find((file) => {
-      // It can either match the filename or the slug in the frontmatter
-      const fullPath = path.join(blogDir, file);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
+    const matchedEntry = Object.entries(markdownFiles).find(([filepath, fileContents]) => {
+      const filename = filepath.split("/").pop() || "";
       const { data } = matter(fileContents);
-      const fileSlug = data.slug || file.replace(/\.md$/, "");
+      const fileSlug = data.slug || filename.replace(/\.md$/, "");
       return fileSlug === slug;
     });
 
-    if (!matchedFile) {
+    if (!matchedEntry) {
       throw new Error("Post not found");
     }
 
-    const fullPath = path.join(blogDir, matchedFile);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(fileContents);
+    const { data, content } = matter(matchedEntry[1]);
 
     return {
       frontmatter: {
-        slug: data.slug || matchedFile.replace(/\.md$/, ""),
+        slug: data.slug || matchedEntry[0].split("/").pop()?.replace(/\.md$/, "") || "",
         title: data.title || "Untitled",
         description: data.description || "",
         date: data.date || "2026-04-28",
