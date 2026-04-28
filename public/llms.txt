@@ -22,6 +22,6 @@ Deterministic rules match what is certain, and SettleProof helps reduce spreadsh
 4. AI Exception Diagnosis: Intelligent analysis of variances.
 
 ## Key URLs
-- Homepage: https://settleproof.app
+- Homepage: https://www.settleproof.app
 - App Login: https://cloud.settleproof.app/
 - Contact: hello@settleproof.app

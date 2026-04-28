@@ -48,7 +48,7 @@ export const Route = createRootRoute({
           "Hire an AI Worker to automate Razorpay, Stripe, and bank reconciliation. SettleProof matches payments, handles exceptions, and provides audit-ready evidence.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://settleproof.app" },
+      { property: "og:url", content: "https://www.settleproof.app/" },
       { property: "og:image", content: "/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "SettleProof — AI Worker for Payment Reconciliation" },
@@ -70,7 +70,7 @@ export const Route = createRootRoute({
           operatingSystem: "Web",
           description:
             "AI payment reconciliation software for payment gateways, bank statements, invoices, settlements, refunds, fees, and exceptions.",
-          url: "https://settleproof.app",
+          url: "https://www.settleproof.app/",
           offers: {
             "@type": "Offer",
             price: "9999",
@@ -81,6 +81,10 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      {
+        rel: "canonical",
+        href: "https://www.settleproof.app/",
+      },
       {
         rel: "icon",
         type: "image/svg+xml",
