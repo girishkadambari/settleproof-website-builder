@@ -16,6 +16,7 @@ Deterministic rules match what is certain, and SettleProof helps reduce spreadsh
 - Outsourced CFO/bookkeeping teams
 
 
+
 ## Core Features
 1. Multi-System Ingestion: Support for Razorpay, Cashfree, PayU, Stripe, bank CSVs, Tally, Zoho Books.
 2. AI Column Mapping: Automatically identifies IDs, UTRs, fees, and GST.
